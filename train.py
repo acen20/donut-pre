@@ -24,7 +24,7 @@ print("=======================")
 print(target_sequence)
 
 # let's print the labels (the first 30 token ID's)
-for id in labels[0].tolist()[:30]:
+for id in labels.tolist()[:30]:
   if id != -100:
     print(donut_train_dataset.processor.decode([id]))
   else:
