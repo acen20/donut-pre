@@ -20,8 +20,8 @@ config.decoder.max_length = max_length
 # TODO we should actually update max_position_embeddings and interpolate the pre-trained ones:
 # https://github.com/clovaai/donut/blob/0acc65a85d140852b8d9928565f0f6b2d98dc088/donut/model.py#L602
 
-processor = DonutProcessor.from_pretrained("naver-clova-ix/donut-base")
-model = VisionEncoderDecoderModel.from_pretrained("naver-clova-ix/donut-base", config=config)
+##processor = DonutProcessor.from_pretrained("naver-clova-ix/donut-base")
+##model = VisionEncoderDecoderModel.from_pretrained("naver-clova-ix/donut-base", config=config)
 
 added_tokens = []
 
@@ -61,7 +61,7 @@ class DonutDataset(Dataset):
         self.prompt_end_token = prompt_end_token if prompt_end_token else task_start_token
         self.sort_json_key = sort_json_key
         self.dataset = dataset
-        self.processor = processor
+        self.processor = None
 
         #self.dataset = load_dataset(dataset_name_or_path, split=self.split)
         self.dataset_length = len(self.dataset)
@@ -74,9 +74,8 @@ class DonutDataset(Dataset):
                 gt_jsons = ground_truth["gt_parses"]
             else:
                 assert "gt_parse" in ground_truth and isinstance(ground_truth["gt_parse"], dict)
-                gt_jsons = ground_truth["gt_parse"]["pairs"]
+                gt_jsons = [ground_truth["gt_parse"]]
 
-            print(gt_jsons[0].keys())
             self.gt_token_sequences.append(
                 [
                     self.json2token(

@@ -52,5 +52,6 @@ def get_data(filepath):
     custom_data = CustomDataset()
     data = Dataset.from_generator(custom_data._generate_examples,
                                 gen_kwargs={'filepath':f'{filepath}'})
+                             
 
     return data

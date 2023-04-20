@@ -1,8 +1,8 @@
 from dataset_ import get_data
 from donut_preprocessor import DonutDataset
 
-TRAIN_DIR = "/home/ahsenmailbox/Desktop/dataset/training_data"
-TEST_DIR = "/home/ahsenmailbox/Desktop/dataset/testing_data"
+TRAIN_DIR = "dataset/training_data"
+TEST_DIR = "dataset/testing_data"
 
 train_dataset = get_data(TRAIN_DIR)
 #test_dataset = get_data(TEST_DIR)
@@ -13,7 +13,7 @@ train_dataset = get_data(TRAIN_DIR)
 
 donut_train_dataset = DonutDataset(dataset = train_dataset, split="train", max_length=768, 
                                    task_start_token="<funsd>", prompt_end_token="<funsd>",
-                                   sort_json_key=False)
+                                   sort_json_key=True)
 
 pixel_values, labels, target_sequence = donut_train_dataset[0]
 
