@@ -45,7 +45,7 @@ class CustomDataset():
 
         
                 
-            yield {"gt_parse": {"pairs":pairs}, "image":image}
+            yield {"ground_truth":{"gt_parse": {"pairs":pairs}, "image":image}}
 
 
 def get_data(filepath):
