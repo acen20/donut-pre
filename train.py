@@ -13,7 +13,7 @@ train_dataset = get_data(TRAIN_DIR)
 
 donut_train_dataset = DonutDataset(dataset = train_dataset, split="train", max_length=768, 
                                    task_start_token="<funsd>", prompt_end_token="<funsd>",
-                                   sort_json_key=True)
+                                   sort_json_key=False)
 
 pixel_values, labels, target_sequence = donut_train_dataset[0]
 

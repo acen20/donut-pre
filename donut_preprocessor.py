@@ -48,7 +48,7 @@ class DonutDataset(Dataset):
         max_length: int,
         split: str = "train",
         ignore_id: int = -100,
-        task_start_token: str = "",
+        task_start_token: str = "<s>",
         prompt_end_token: str = None,
         sort_json_key: bool = True,
     ):
@@ -76,8 +76,6 @@ class DonutDataset(Dataset):
                 assert "gt_parse" in ground_truth and isinstance(ground_truth["gt_parse"], dict)
                 gt_jsons = [ground_truth["gt_parse"]]
                 
-            print(gt_jsons[0].keys())
-
             self.gt_token_sequences.append(
                 [
                     self.json2token(
@@ -107,16 +105,17 @@ class DonutDataset(Dataset):
                 else:
                     keys = obj.keys()
                 for k in keys:
+
                     if update_special_tokens_for_json_key:
-                        self.add_tokens([fr"", fr""])
+                        self.add_tokens([fr"<s_{k}>", fr"</s_{k}>"])
                     output += (
-                        fr""
+                        fr"<s_{k}>"
                         + self.json2token(obj[k], update_special_tokens_for_json_key, sort_json_key)
-                        + fr""
+                        + fr"</s_{k}>"
                     )
                 return output
         elif type(obj) == list:
-            return r"".join(
+            return r"<sep/>".join(
                 [self.json2token(item, update_special_tokens_for_json_key, sort_json_key) for item in obj]
             )
         else:
@@ -124,6 +123,9 @@ class DonutDataset(Dataset):
             if f"<{obj}/>" in added_tokens:
                 obj = f"<{obj}/>"  # for categorical special tokens
             return obj
+        
+    print(added_tokens)
+    print(len(added_tokens))
     
     def add_tokens(self, list_of_tokens: List[str]):
         """
@@ -153,9 +155,7 @@ class DonutDataset(Dataset):
         pixel_values = pixel_values.squeeze()
 
         # targets
-        
-        target_sequence = self.gt_token_sequences[idx]  # can be more than one, e.g., DocVQA Task 1
-        print(target_sequence)
+        target_sequence = random.choice(self.gt_token_sequences[idx])  # can be more than one, e.g., DocVQA Task 1
         input_ids = processor.tokenizer(
             target_sequence,
             add_special_tokens=False,
