@@ -1,0 +1,12 @@
+sentencepiece
+transformers==4.27.1
+pandas==1.5.3
+opencv-python==4.6.0.66 
+torch==1.11.0
+torchvision==0.12.0
+pyyaml==5.4.1
+pillow==9.4.0
+shapely==1.8.2
+pdf2image==1.14.0
+datasets==2.10.1
+seqeval==1.2.2
