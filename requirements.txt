@@ -10,3 +10,5 @@ shapely==1.8.2
 pdf2image==1.14.0
 datasets==2.10.1
 seqeval==1.2.2
+pytorch-lightning==2.0.1.post0
+nltk==3.8.1

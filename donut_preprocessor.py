@@ -62,6 +62,7 @@ class DonutDataset(Dataset):
         self.sort_json_key = sort_json_key
         self.dataset = dataset
         self.processor = processor
+        self.model = model
 
         #self.dataset = load_dataset(dataset_name_or_path, split=self.split)
         self.dataset_length = len(self.dataset)
@@ -83,13 +84,13 @@ class DonutDataset(Dataset):
                         update_special_tokens_for_json_key=self.split == "train",
                         sort_json_key=self.sort_json_key,
                     )
-                    + processor.tokenizer.eos_token
+                    + self.processor.tokenizer.eos_token
                     for gt_json in gt_jsons  # load json from list of json
                 ]
             )
 
         self.add_tokens([self.task_start_token, self.prompt_end_token])
-        self.prompt_end_token_id = processor.tokenizer.convert_tokens_to_ids(self.prompt_end_token)
+        self.prompt_end_token_id = self.processor.tokenizer.convert_tokens_to_ids(self.prompt_end_token)
 
     def json2token(self, obj: Any, update_special_tokens_for_json_key: bool = True, sort_json_key: bool = True):
         """
@@ -123,17 +124,14 @@ class DonutDataset(Dataset):
             if f"<{obj}/>" in added_tokens:
                 obj = f"<{obj}/>"  # for categorical special tokens
             return obj
-        
-    print(added_tokens)
-    print(len(added_tokens))
     
     def add_tokens(self, list_of_tokens: List[str]):
         """
         Add special tokens to tokenizer and resize the token embeddings of the decoder
         """
-        newly_added_num = processor.tokenizer.add_tokens(list_of_tokens)
+        newly_added_num = self.processor.tokenizer.add_tokens(list_of_tokens)
         if newly_added_num > 0:
-            model.decoder.resize_token_embeddings(len(processor.tokenizer))
+            self.model.decoder.resize_token_embeddings(len(self.processor.tokenizer))
             added_tokens.extend(list_of_tokens)
     
     def __len__(self) -> int:
@@ -151,12 +149,12 @@ class DonutDataset(Dataset):
         sample = self.dataset[idx]
 
         # inputs
-        pixel_values = processor(sample["image"], random_padding=self.split == "train", return_tensors="pt").pixel_values
+        pixel_values = self.processor(sample["image"], random_padding=self.split == "train", return_tensors="pt").pixel_values
         pixel_values = pixel_values.squeeze()
 
         # targets
         target_sequence = random.choice(self.gt_token_sequences[idx])  # can be more than one, e.g., DocVQA Task 1
-        input_ids = processor.tokenizer(
+        input_ids = self.processor.tokenizer(
             target_sequence,
             add_special_tokens=False,
             max_length=self.max_length,
@@ -166,6 +164,6 @@ class DonutDataset(Dataset):
         )["input_ids"].squeeze(0)
 
         labels = input_ids.clone()
-        labels[labels == processor.tokenizer.pad_token_id] = self.ignore_id  # model doesn't need to predict pad token
+        labels[labels == self.processor.tokenizer.pad_token_id] = self.ignore_id  # model doesn't need to predict pad token
         # labels[: torch.nonzero(labels == self.prompt_end_token_id).sum() + 1] = self.ignore_id  # model doesn't need to predict prompt (for VQA)
         return pixel_values, labels, target_sequence
