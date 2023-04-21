@@ -8,10 +8,6 @@ VAL_DIR = "dataset/testing_data"
 train_dataset = get_data(TRAIN_DIR)
 val_dataset = get_data(VAL_DIR)
 
-#example = train_dataset[0]['gt_parse']
-
-#print(example)
-
 donut_train_dataset = DonutDataset(dataset = train_dataset, split="train", max_length=768, 
                                    task_start_token="<s_custom>", prompt_end_token="<s_custom>",
                                    sort_json_key=False)
@@ -155,3 +151,40 @@ class DonutModelPLModule(pl.LightningModule):
 
     def val_dataloader(self):
         return val_dataloader
+    
+
+config = {"max_epochs":30,
+          "val_check_interval":0.2, # how many times we want to validate during an epoch
+          "check_val_every_n_epoch":1,
+          "gradient_clip_val":1.0,
+          "num_training_samples_per_epoch": 149,
+          "lr":3e-5,
+          "train_batch_sizes": [1],
+          "val_batch_sizes": [1],
+          # "seed":2022,
+          "num_nodes": 1,
+          "warmup_steps": 300, # 800/8*30/10, 10%
+          "result_path": "./result",
+          "verbose": True,
+          }
+
+model_module = DonutModelPLModule(config, processor, model)
+
+from pytorch_lightning.callbacks import Callback, EarlyStopping
+
+early_stop_callback = EarlyStopping(monitor="val_edit_distance", patience=3, verbose=False, mode="min")
+
+trainer = pl.Trainer(
+        accelerator="cpu",
+        devices=1,
+        max_epochs=config.get("max_epochs"),
+        val_check_interval=config.get("val_check_interval"),
+        check_val_every_n_epoch=config.get("check_val_every_n_epoch"),
+        gradient_clip_val=config.get("gradient_clip_val"),
+        precision="32", # we'll use mixed precision
+        num_sanity_val_steps=0,
+        #logger=wandb_logger,
+        callbacks=[early_stop_callback],
+)
+
+trainer.fit(model_module)
