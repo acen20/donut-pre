@@ -60,13 +60,13 @@ class DonutDataset(Dataset):
         self.task_start_token = task_start_token
         self.prompt_end_token = prompt_end_token if prompt_end_token else task_start_token
         self.sort_json_key = sort_json_key
-
+        print("LOADING DATA FROM------>",dataset_name_or_path)
         self.dataset = load_dataset(dataset_name_or_path, split=self.split)
         self.dataset_length = len(self.dataset)
 
         self.gt_token_sequences = []
         for sample in self.dataset:
-            ground_truth = json.loads(sample["ground_truth"])
+            ground_truth = sample["ground_truth"]
             if "gt_parses" in ground_truth:  # when multiple ground truths are available, e.g., docvqa
                 assert isinstance(ground_truth["gt_parses"], list)
                 gt_jsons = ground_truth["gt_parses"]
