@@ -35,23 +35,26 @@ class CustomDataset():
                     continue
                 
                 if label == "question":
+                    obj = {}
                     question = item["text"]
                     answer = ""
                     if item["linking"]:
                         answer = [a for a in data["form"] if a["id"] == item["linking"][0][1]]
                         answer = answer[0]["text"] if answer else ""
+                    obj["question"] = question
+                    obj["answer"] = answer
+                    pairs.append(obj)
 
-                    pairs.append({"question":question, "answer": answer})
-
-        
-                
-            yield {"ground_truth":{"gt_parse": {"pairs":pairs}}, "image":image}
+            yield {"file_name":image_path.split("/")[-1], "ground_truth":{"gt_parse": {"pairs":pairs}}}
 
 
 def get_data(filepath):
     custom_data = CustomDataset()
     data = Dataset.from_generator(custom_data._generate_examples,
                                 gen_kwargs={'filepath':f'{filepath}'})
-                             
-
+    with open("example/metadata.jsonl", "w") as f:
+        for sample in data:                             
+            f.write(json.dumps(sample))
+            f.write("\n")
+    
     return data

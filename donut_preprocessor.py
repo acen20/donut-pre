@@ -7,8 +7,10 @@ from torch.utils.data import Dataset
 from datasets import load_dataset, load_from_disk
 from transformers import VisionEncoderDecoderConfig
 from transformers import DonutProcessor, VisionEncoderDecoderModel
+from PIL import Image
 
 image_size = [1280, 960]
+
 max_length = 768
 
 # update image_size of the encoder
@@ -44,7 +46,7 @@ class DonutDataset(Dataset):
 
     def __init__(
         self,
-        dataset: Any,
+        dataset: str,
         max_length: int,
         split: str = "train",
         ignore_id: int = -100,
@@ -60,16 +62,16 @@ class DonutDataset(Dataset):
         self.task_start_token = task_start_token
         self.prompt_end_token = prompt_end_token if prompt_end_token else task_start_token
         self.sort_json_key = sort_json_key
-        self.dataset = dataset
         self.processor = processor
         self.model = model
 
-        #self.dataset = load_dataset(dataset_name_or_path, split=self.split)
+        self.dataset = load_dataset(dataset, split=self.split)
         self.dataset_length = len(self.dataset)
 
         self.gt_token_sequences = []
         for sample in self.dataset:
             ground_truth = sample["ground_truth"]
+
             if "gt_parses" in ground_truth:  # when multiple ground truths are available, e.g., docvqa
                 assert isinstance(ground_truth["gt_parses"], list)
                 gt_jsons = ground_truth["gt_parses"]
@@ -149,7 +151,7 @@ class DonutDataset(Dataset):
         sample = self.dataset[idx]
 
         # inputs
-        pixel_values = self.processor(sample["image"], random_padding=self.split == "train", return_tensors="pt").pixel_values
+        pixel_values = self.processor(sample["image"].convert("RGB"), random_padding=self.split == "train", return_tensors="pt").pixel_values
         pixel_values = pixel_values.squeeze()
 
         # targets
