@@ -1,5 +1,5 @@
-sentencepiece
-transformers==4.27.1
+sentencepiece==0.1.95
+transformers==4.27.0
 pandas==1.5.3
 opencv-python==4.6.0.66 
 torch==1.11.0

@@ -6,7 +6,7 @@ TRAIN_DIR = "dataset/training_data"
 VAL_DIR = "dataset/testing_data"
 
 #train_dataset = get_data(TRAIN_DIR)
-#val_dataset = get_data(VAL_DIR)
+val_dataset = get_data(VAL_DIR)
 
 donut_train_dataset = DonutDataset(dataset = "example", split="train", max_length=768, 
                                    task_start_token="<s_custom>", prompt_end_token="<s_custom>",

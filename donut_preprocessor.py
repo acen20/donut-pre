@@ -7,7 +7,6 @@ from torch.utils.data import Dataset
 from datasets import load_dataset, load_from_disk
 from transformers import VisionEncoderDecoderConfig
 from transformers import DonutProcessor, VisionEncoderDecoderModel
-from PIL import Image
 
 image_size = [1280, 960]
 
@@ -46,7 +45,7 @@ class DonutDataset(Dataset):
 
     def __init__(
         self,
-        dataset: str,
+        dataset: Any,
         max_length: int,
         split: str = "train",
         ignore_id: int = -100,
@@ -64,8 +63,8 @@ class DonutDataset(Dataset):
         self.sort_json_key = sort_json_key
         self.processor = processor
         self.model = model
-
-        self.dataset = load_dataset(dataset, split=self.split)
+        self.dataset = dataset
+        #self.dataset = load_dataset(dataset, split=self.split)
         self.dataset_length = len(self.dataset)
 
         self.gt_token_sequences = []
