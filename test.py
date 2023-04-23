@@ -15,7 +15,7 @@ from datasets import load_dataset
 from PIL import Image
 from tqdm import tqdm
 
-from donut import DonutModel, JSONParseEvaluator, load_json, save_json
+from donut import DonutModel, JSONParseEvaluator, load_json, save_json, get_raw_data
 
 
 def test(args):
@@ -35,7 +35,8 @@ def test(args):
     accs = []
 
     evaluator = JSONParseEvaluator()
-    dataset = load_dataset(args.dataset_name_or_path, split=args.split)
+    print(args.dataset_name_or_path)
+    dataset = get_raw_data(f"{args.dataset_name_or_path}")
 
     for idx, sample in tqdm(enumerate(dataset), total=len(dataset)):
         ground_truth = sample["ground_truth"]

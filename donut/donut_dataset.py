@@ -61,10 +61,7 @@ class CustomDataset():
 
 
 def get_data(filepath, split, task_name, donut_model):
-    custom_data = CustomDataset()
-    data = Dataset.from_generator(custom_data._generate_examples,
-                                gen_kwargs={'filepath':f'{filepath}'})
-
+    data = get_raw_data(filepath)
     dataset = DonutDataset(dataset = data, split=split, max_length=768, 
                                    task_start_token=f"<s_{task_name}>", 
                                    prompt_end_token=f"<s_{task_name}>",
@@ -72,3 +69,11 @@ def get_data(filepath, split, task_name, donut_model):
                                    donut_model=donut_model)  
     
     return dataset
+
+
+def get_raw_data(filepath):
+    custom_data = CustomDataset()
+    data = Dataset.from_generator(custom_data._generate_examples,
+                                gen_kwargs={'filepath':f'{filepath}'})
+    
+    return data
