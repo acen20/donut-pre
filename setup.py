@@ -46,6 +46,7 @@ setup(
             "README.md",
             "train.py",
             "test.py",
+            "inference.py"
         ]
     ),
     python_requires=">=3.7",
@@ -53,7 +54,7 @@ setup(
         "transformers>=4.11.3",
         "timm",
         "datasets[vision]",
-        "pytorch-lightning>=1.6.4",
+        "pytorch-lightning==1.6.4",
         "nltk",
         "sentencepiece",
         "zss",
