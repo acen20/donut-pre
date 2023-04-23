@@ -75,14 +75,16 @@ def train(config):
             
         for split in ["train", "test"]:
             datasets[split].append(
-                get_data(f"{dataset_name_or_path}/{split}", 
-                         split=split, task_name = task_name)
+                get_data(filepath = f"{dataset_name_or_path}/{split}",
+                         split=split,
+                         task_name=task_name,
+                         donut_model=model_module.model)
             )
             # prompt_end_token is used for ignoring a given prompt in a loss function
             # for docvqa task, i.e., {"question": {used as a prompt}, "answer": {prediction target}},
             # set prompt_end_token to "<s_answer>"
     data_module.train_datasets = datasets["train"]
-    data_module.val_datasets = datasets["validation"]
+    data_module.val_datasets = datasets["test"]
 
     logger = TensorBoardLogger(
         save_dir=config.result_path,

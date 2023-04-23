@@ -1,8 +1,7 @@
-from .util import normalize_bbox, load_image
+from .util import normalize_bbox, load_image, DonutDataset
 import json
 import os
 from datasets import Dataset
-from . import DonutDataset
 
 class CustomDataset():
 
@@ -61,7 +60,7 @@ class CustomDataset():
             yield {"image":image, "ground_truth":{"gt_parse": gt_parse}}
 
 
-def get_data(filepath, split, task_name):
+def get_data(filepath, split, task_name, donut_model):
     custom_data = CustomDataset()
     data = Dataset.from_generator(custom_data._generate_examples,
                                 gen_kwargs={'filepath':f'{filepath}'})
@@ -69,6 +68,7 @@ def get_data(filepath, split, task_name):
     dataset = DonutDataset(dataset = data, split=split, max_length=768, 
                                    task_start_token=f"<s_{task_name}>", 
                                    prompt_end_token=f"<s_{task_name}>",
-                                   sort_json_key=False)  
+                                   sort_json_key=False,
+                                   donut_model=donut_model)  
     
     return dataset
