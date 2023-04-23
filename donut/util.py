@@ -8,6 +8,7 @@ import os
 import random
 from collections import defaultdict
 from typing import Any, Dict, List, Tuple, Union
+from PIL import Image
 
 import torch
 import zss
@@ -42,7 +43,7 @@ class DonutDataset(Dataset):
 
     def __init__(
         self,
-        dataset_name_or_path: str,
+        dataset: Any,
         donut_model: PreTrainedModel,
         max_length: int,
         split: str = "train",
@@ -60,8 +61,7 @@ class DonutDataset(Dataset):
         self.task_start_token = task_start_token
         self.prompt_end_token = prompt_end_token if prompt_end_token else task_start_token
         self.sort_json_key = sort_json_key
-        print("LOADING DATA FROM------>",dataset_name_or_path)
-        self.dataset = load_dataset(dataset_name_or_path, split=self.split)
+        self.dataset = dataset
         self.dataset_length = len(self.dataset)
 
         self.gt_token_sequences = []
@@ -338,3 +338,18 @@ class JSONParseEvaluator:
                 )
             ),
         )
+
+
+
+def load_image(image_path):
+    image = Image.open(image_path).convert("RGB")
+    w, h = image.size
+    return image, (w, h)
+
+def normalize_bbox(bbox, size):
+    return [
+        int(1000 * bbox[0] / size[0]),
+        int(1000 * bbox[1] / size[1]),
+        int(1000 * bbox[2] / size[0]),
+        int(1000 * bbox[3] / size[1]),
+    ]
