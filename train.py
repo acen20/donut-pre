@@ -52,7 +52,7 @@ def save_config_file(config, path):
 
 
 def train(config):
-    pl.utilities.seed.seed_everything(config.get("seed", 42), workers=True)
+    #pl.utilities.seed(config.get("seed", 42), workers=True)
 
     model_module = DonutModelPLModule(config)
     data_module = DonutDataPLModule(config)
@@ -109,7 +109,7 @@ def train(config):
         resume_from_checkpoint=config.get("resume_from_checkpoint_path", None),
         num_nodes=config.get("num_nodes", 1),
         gpus=torch.cuda.device_count(),
-        strategy="ddp",
+        trategy="ddp",
         accelerator="cpu",
         plugins=custom_ckpt,
         max_epochs=config.max_epochs,
