@@ -35,6 +35,7 @@ class DonutModelPLModule(pl.LightningModule):
                 ignore_mismatched_sizes=True,
             )
         else:
+            print("LOADING FROM SCRATCH")
             self.model = DonutModel(
                 config=DonutConfig(
                     input_size=self.config.input_size,
@@ -148,7 +149,7 @@ class DonutModelPLModule(pl.LightningModule):
 
     @rank_zero_only
     def on_save_checkpoint(self, checkpoint):
-        save_path = Path(self.config.result_path) / self.config.exp_name / self.config.exp_version
+        save_path = Path(self.config.save_path)
         self.model.save_pretrained(save_path)
         self.model.decoder.tokenizer.save_pretrained(save_path)
 

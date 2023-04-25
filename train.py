@@ -1,8 +1,3 @@
-"""
-Donut
-Copyright (c) 2022-present NAVER Corp.
-MIT License
-"""
 import argparse
 import datetime
 import json
@@ -59,8 +54,9 @@ def train(config):
 
     # add datasets to data_module
     datasets = {"train": [], "test": []}
-    for i, dataset_name_or_path in enumerate(config.dataset_name_or_paths):
-        task_name = os.path.basename(dataset_name_or_path)  # e.g., cord-v2, docvqa, rvlcdip, ...
+    for dataset_name_or_path in config.dataset_name_or_paths:
+        task_name = "custom"
+        #task_name = os.path.basename(dataset_name_or_path)  # e.g., cord-v2, docvqa, rvlcdip, ...
         
         # add categorical special tokens (optional)
         if task_name == "rvlcdip":
@@ -87,9 +83,7 @@ def train(config):
     data_module.val_datasets = datasets["test"]
 
     logger = TensorBoardLogger(
-        save_dir=config.result_path,
-        name=config.exp_name,
-        version=config.exp_version,
+        save_dir=config.save_path,
         default_hp_metric=False,
     )
 
@@ -97,7 +91,7 @@ def train(config):
 
     checkpoint_callback = ModelCheckpoint(
         monitor="val_metric",
-        dirpath=Path(config.result_path) / config.exp_name / config.exp_version,
+        dirpath=Path(config.save_path),
         filename="artifacts",
         save_top_k=1,
         save_last=False,
@@ -129,14 +123,14 @@ def train(config):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", type=str, required=True)
-    parser.add_argument("--exp_version", type=str, required=False)
+    parser.add_argument("--save_path", type=str, required=False)
     args, left_argv = parser.parse_known_args()
 
     config = Config(args.config)
     config.argv_update(left_argv)
 
-    config.exp_name = basename(args.config).split(".")[0]
-    config.exp_version = datetime.datetime.now().strftime("%Y%m%d_%H%M%S") if not args.exp_version else args.exp_version
+    config.dataset_name_or_paths = ["/home/ahsenmailbox/Desktop/22-04-2023/donut/data"]
+    config.save_path = "/home/ahsenmailbox/Desktop/22-04-2023/donut/model"
 
-    save_config_file(config, Path(config.result_path) / config.exp_name / config.exp_version)
+    save_config_file(config, config.save_path)
     train(config)

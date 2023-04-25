@@ -1,8 +1,3 @@
-"""
-Donut
-Copyright (c) 2022-present NAVER Corp.
-MIT License
-"""
 import argparse
 import json
 import os

@@ -32,14 +32,16 @@ class CustomDataset():
                 words = [w for w in words if w["text"].strip() != ""]
                 if len(words) == 0:
                     continue
-                    
-                if label not in ["answer", "question"]:
+
+                ## FOLLOWING COMMENTED SECTION WILL HANDLE LABELS OTHER THAN QnA (NOT TO BE USED NOW)
+                '''if label not in ["answer", "question"]:
                     obj = {"text_sequence":item["text"]}
                     if label not in other_labels.keys():
                         other_labels[label] = [obj]
                     else:
                         other_labels[label].append(obj)
-                
+                '''
+
                 if "question" in label.lower():
                     obj = {}
                     question = item["text"]
@@ -55,7 +57,7 @@ class CustomDataset():
                 "pairs":pairs
             }
 
-            gt_parse.update(other_labels)
+            #gt_parse.update(other_labels)
 
             yield {"image":image, "ground_truth":{"gt_parse": gt_parse}}
 
