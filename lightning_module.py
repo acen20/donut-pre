@@ -35,7 +35,6 @@ class DonutModelPLModule(pl.LightningModule):
                 ignore_mismatched_sizes=True,
             )
         else:
-            print("LOADING FROM SCRATCH")
             self.model = DonutModel(
                 config=DonutConfig(
                     input_size=self.config.input_size,
